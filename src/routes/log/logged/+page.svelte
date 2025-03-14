@@ -24,11 +24,11 @@
 </style>
 
 <script lang="ts">
-    import Logger from "$lib/Logger.svelte";
+    import Button from "$lib/Button.svelte";
 </script>
 <div class="background">
     <div class="window">
-        <h1>How are you feeling right now?</h1>
-        <Logger />
+        <h1>The entry has been logged.</h1>
+        <Button text="Return to calendar" href="/calendar" />
     </div>
 </div>
