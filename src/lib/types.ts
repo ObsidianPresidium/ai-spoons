@@ -1,3 +1,9 @@
+export type TCalendarState = {
+    currentDate: Date;
+    view: string;
+    days: Date[];
+}
+
 export type Entry = {
     date: Date;
     privacy?: boolean;

@@ -19,81 +19,68 @@
             width: 100%;
         }
     }
+    .date {
+        display: flex;
+        justify-content: start;
+        &__text {
+            color: white;
+            font-family: "Inter", sans-serif;
+            font-weight: bold;
+            font-size: 2rem;
+
+            transition: width 200ms;
+        }
+    }
 </style>
 <script lang="ts">
+    import { calendar, calendarState } from "$lib/calendarHandler";
     import CalendarDay from "$lib/CalendarDay.svelte";
+    import { onDestroy } from "svelte";
 
-    let currentDate = new Date();  // change this to a prop later
+    let listedDays = $state(calendar.tools.getListedDays());
+    let elDate: HTMLHeadingElement;
+    let elDateFake: HTMLHeadingElement;
+    let elCalendar: HTMLDivElement;
 
-    function getDaysInMonth() {
-        let days = [];
-        let daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-        for (let i=0; i<daysInMonth; i++) {
-            days.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), i+1));
-        }
-        return days;
-    }
+    const destroySubscription = calendarState.subscribe(() => {
+        listedDays = calendar.tools.getListedDays();
+    });
 
-    const days = getDaysInMonth();
-
-    function getListedDays() {
-        const totalDaysListed = 42;
-
-        // first monday logic
-        let index = 0;
-        let firstMonday = days[index];
-        while (firstMonday.getDay() !== 1) {
-            index ++;
-            firstMonday = days[index];
-        }
-
-        const numDaysBefore = 7 - (firstMonday.getDate() - 1);
-        const numDaysAfter = totalDaysListed - numDaysBefore - days.length;
-        let daysBefore = [];
-        let daysAfter = [];
-        
-        const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-        for (let i=0; i<numDaysBefore; i++) {
-            let day = new Date(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate() - numDaysBefore + i);
-            daysBefore.push(day);
-        }
-
-        const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-        for (let i=1; i<numDaysAfter + 1; i++) {
-            let day = new Date(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate() + i);
-            daysAfter.push(day);
-        }
-
-        return [...daysBefore, ...days, ...daysAfter];
-    }
-
-
-    const listedDays = getListedDays();
+    const changeMonth = (e: WheelEvent) => {
+        calendar.tools.incrementMonth(Math.sign(e.deltaY));
+    };
+    
+    onDestroy(destroySubscription);
 </script>
 
-<div class="calendar">
-    <div class="day-of-week">
-        <p class="day-of-week__text">M</p>
+<div class="window">
+    <div class="date">
+        <h2 class="date__text">{$calendarState.currentDate.toLocaleString("default", {month: "long"})} {$calendarState.currentDate.getFullYear()}</h2>
     </div>
-    <div class="day-of-week">
-        <p class="day-of-week__text">T</p>
+    <div class="calendar" bind:this={elCalendar} onwheel={changeMonth}>
+        <div class="day-of-week">
+            <p class="day-of-week__text">M</p>
+        </div>
+        <div class="day-of-week">
+            <p class="day-of-week__text">T</p>
+        </div>
+        <div class="day-of-week">
+            <p class="day-of-week__text">W</p>
+        </div>
+        <div class="day-of-week">
+            <p class="day-of-week__text">T</p>
+        </div>
+        <div class="day-of-week">
+            <p class="day-of-week__text">F</p>
+        </div>
+        <div class="day-of-week">
+            <p class="day-of-week__text">S</p>
+        </div>
+        <div class="day-of-week">
+            <p class="day-of-week__text">S</p>
+        </div>
+        {#each listedDays as day}
+            <CalendarDay date={day} monthDiff={calendar.tools.monthDiff(calendar.tools.getCurrentDate(), day)} />
+        {/each}
     </div>
-    <div class="day-of-week">
-        <p class="day-of-week__text">W</p>
-    </div>
-    <div class="day-of-week">
-        <p class="day-of-week__text">T</p>
-    </div>
-    <div class="day-of-week">
-        <p class="day-of-week__text">F</p>
-    </div>
-    <div class="day-of-week">
-        <p class="day-of-week__text">S</p>
-    </div>
-    <div class="day-of-week">
-        <p class="day-of-week__text">S</p>
-    </div>
-    {#each listedDays as day}
-        <CalendarDay date={day} isCurrentMonth={day.getMonth() === currentDate.getMonth()} />
-    {/each}
 </div>
