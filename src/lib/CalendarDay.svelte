@@ -36,6 +36,7 @@
 
 <script lang="ts">
     import { onMount } from "svelte";
+    import { contextMenu } from "$lib/contextMenuLogic";
     import { calendar } from "$lib/calendarHandler";
     
     interface Props {
@@ -48,10 +49,33 @@
 
     let window: HTMLDivElement;
 
-    let clickHandler: () => void = () => {
+    let clickHandler: (e: MouseEvent) => void = (e) => {
         if (monthDiff != 0) {
-            console.log("Monthdiff", monthDiff);
-            calendar.tools.incrementMonth(monthDiff);  // not sure why i need to invert this
+            calendar.tools.incrementMonth(monthDiff);
+        } else {
+            contextMenu.open(e, [
+                {
+                    text: "Add Event",
+                    action: () => {
+                        console.log("Add Event");
+                    }
+                },
+                {
+                    text: "Edit Event",
+                    action: () => {
+                        console.log("Edit Event");
+                    }
+                },
+                {
+                    text: "HROW"
+                },
+                {
+                    text: "Delete Event",
+                    action: () => {
+                        console.log("Delete Event");
+                    }
+                }
+            ]);
         }
     }
 

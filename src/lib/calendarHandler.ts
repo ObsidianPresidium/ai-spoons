@@ -24,10 +24,8 @@ const setCalendarState = (view: string, date: Date) => {
             state.view = view;
             return state;
         });
-        console.log("New view: ", view);
     }
     if (date) {
-        console.log("New date: ", date);
         calendarState.update(state => {
             state.currentDate = date;
             state.days = getDaysInMonth(date);
@@ -79,7 +77,6 @@ export const calendar = {
         incrementMonth: (i: number) => {
             const currentDate = get(calendarState).currentDate;
             const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
-            console.log("getMonth", currentDate.getMonth(), ", nextMonth", nextMonth);
             setCalendarState("month", nextMonth);
             return nextMonth;
         },

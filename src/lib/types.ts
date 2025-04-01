@@ -4,6 +4,11 @@ export type TCalendarState = {
     days: Date[];
 }
 
+export type TContextMenuItem = {
+    text: string,
+    action?: () => void;
+}
+
 export type Entry = {
     date: Date;
     privacy?: boolean;
