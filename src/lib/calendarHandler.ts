@@ -18,7 +18,6 @@ export const calendarState: Writable<TCalendarState> = writable<TCalendarState>(
 });
 
 const setCalendarState = (view: string, date: Date) => {
-    console.log("Calendar state changed:")
     if (view) {
         calendarState.update(state => {
             state.view = view;

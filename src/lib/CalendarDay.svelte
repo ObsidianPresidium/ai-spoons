@@ -49,27 +49,54 @@
 
     let window: HTMLDivElement;
 
+    function getDateWithEnding() {
+        const month = date.toLocaleDateString("en-US", { month: "long" });
+        const day = date.getDate();
+        switch (day) {
+            case 1:
+            case 21:
+            case 31:
+                return `${month} ${day}st`;
+            case 2:
+            case 22:
+                return `${month} ${day}nd`;
+            case 3:
+            case 23:
+                return `${month} ${day}rd`;
+            default:
+                return `${month} ${day}th`;
+        }
+    }
+
     let clickHandler: (e: MouseEvent) => void = (e) => {
         if (monthDiff != 0) {
             calendar.tools.incrementMonth(monthDiff);
         } else {
             contextMenu.open(e, [
                 {
+                    type: "title",
+                    text: getDateWithEnding()
+                },
+                {
+                    type: "link",
                     text: "Add Event",
                     action: () => {
                         console.log("Add Event");
                     }
                 },
                 {
+                    type: "link",
                     text: "Edit Event",
                     action: () => {
                         console.log("Edit Event");
                     }
                 },
                 {
-                    text: "HROW"
+                    type: "hrow",
+                    text: ""
                 },
                 {
+                    type: "link",
                     text: "Delete Event",
                     action: () => {
                         console.log("Delete Event");

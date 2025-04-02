@@ -5,7 +5,8 @@ export type TCalendarState = {
 }
 
 export type TContextMenuItem = {
-    text: string,
+    type: string;
+    text: string;
     action?: () => void;
 }
 

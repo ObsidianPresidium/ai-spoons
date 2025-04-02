@@ -24,6 +24,7 @@
     }
 
     .item {
+        $item: &;
         display: flex;
         justify-content: left;
         align-items: center;
@@ -33,17 +34,25 @@
         height: 1rem;
         box-sizing: border-box;
 
+        transition: background-color 200ms;
+
         &:not(:has(hr)) {
             padding: 1rem 0.5rem;
         }
-        transition: background-color 200ms;
 
-        
+        &:has(hr):has(.title) {
+            padding-left: 0.5rem;
+
+            .title {
+                margin-right: 0.5rem;
+            }
+        }
+
         &:first-child:not(:has(hr)) {
             border-radius: 0.5rem 0.5rem 0 0;
         }
 
-        &:not(:has(hr)):hover {
+        &:not(:has(hr)):not(:has(.title)):hover {
             background-color: #6c6caf;
         }
 
@@ -52,17 +61,24 @@
         }
 
         p {
-            color: white;
             font-family: "Inter", sans-serif;
             font-weight: bold;
             font-size: 1rem;
             text-align: left;
         }
 
+        .title {
+            color: grey;
+        }
+
+        .text {
+            color: white;
+        }
+
         hr {
             width: calc(100% - 0.5rem);
             height: 0.1rem;
-            background-color: white;
+            background-color: grey;
             border: none;
             margin: 0 auto;
             padding: 0;
@@ -81,7 +97,8 @@
     let doAction: (action: () => void) => void;
 
     onMount(() => {
-        doAction = (action: () => void) => {
+        doAction = (action: () => void | undefined) => {
+            if (!action) return;
             action();
             contextMenu.close();
         }
@@ -107,14 +124,17 @@
 </div>
 <div class="menu hidden" bind:this={menu}>
     {#each items as item}
-        {#if item.text === "HROW"}
-            <div class="item">
+        <div class="item" onclick={() => doAction(item.action)}>
+            {#if item.type === "hrow"}
+                {#if item.text !== ""}
+                    <p class="title">{item.text}</p>
+                #{/if}
                 <hr />
-            </div>
-        {:else}
-            <div class="item" onclick={() => doAction(item.action)}>
-                <p>{item.text}</p>
-            </div>
-        {/if}
+            {:else if item.type === "title"}
+                <p class="title">{item.text}</p>
+            {:else if item.type === "link"}
+                <p class="text">{item.text}</p>
+            {/if}
+        </div>
     {/each}
 </div>
