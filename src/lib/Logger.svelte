@@ -50,6 +50,12 @@
         elEntry.value = JSON.stringify({...entry, date: entry.date.toDateString(), privacy: privateLog});
         elForm.submit();
     }
+
+    let startOver = () => {
+        elEntry.value = "";
+        elaborate("basic-mood");
+    }
+
     let log = (elaboration: string, information: any) => {
         // code to handle the elaboration and information
         if (elaboration === "basic-mood") {
@@ -60,7 +66,10 @@
         loggers.forEach((logger) => logger.classList.add("log--hidden"));
     }
     let elaborate = (elaboration: string) => {
-        
+        if (elaboration === "basic-mood") {
+            elBasicLog.classList.remove("log--hidden");
+            elElaborateDialog.classList.add("log--hidden");
+        }
     }
 
     onMount(() => {
@@ -78,6 +87,7 @@
     <div class="log log--hidden" bind:this={elElaborateDialog}>
         <Button text="Write a note" width="15rem" href={() => elaborate("note")} />
         <Button text="Log this entry" width="15rem" href={submit} />
+        <Button text="Start over" width="15rem" href={startOver} />
     </div>
 </div>
 
