@@ -3,9 +3,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-
         padding: 0.5rem;
-
         background-image: linear-gradient(135deg, rgba(17,24,39,1) 0%, rgba(55,65,81,1) 35%, rgba(0,0,0,1) 100%);
         color: white;
         font-family: "Inter", sans-serif;
