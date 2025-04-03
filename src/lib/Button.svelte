@@ -1,15 +1,23 @@
 <style lang="scss">
     .btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        padding: 0.5rem;
+
         background-image: linear-gradient(135deg, rgba(17,24,39,1) 0%, rgba(55,65,81,1) 35%, rgba(0,0,0,1) 100%);
         color: white;
-        padding: 1rem 2rem;
         font-family: "Inter", sans-serif;
         font-weight: bold;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         background-size: 400% 100%;
         background-position-x: 0%;
         border: 2px solid white;
         border-radius: .5rem;
+
+        width: 100%;
+        height: 100%;
 
         transition: background-position-x 300ms cubic-bezier(0,0,0,1);
         position: relative;
@@ -34,15 +42,17 @@
         text: string,
         href?: void | (() => void) | string,
         disabled?: boolean | undefined,
-        width?: string | undefined
+        width?: string | undefined,
+        height?: string | undefined
     }
     
-    let { text, href = undefined, disabled = false, width = undefined } : Props = $props();
+    let { text, href = undefined, disabled = false, width = undefined, height = undefined } : Props = $props();
 
     const useAnchorElement = typeof href === "string";
 
     onMount(() => {
         if (width) elButton.style.width = width;
+        if (height) elButton.style.height = height;
         if (href) {
             if (useAnchorElement) {
                 elAnchor.href = href as string;

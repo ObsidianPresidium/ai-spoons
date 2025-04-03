@@ -1,12 +1,14 @@
 <style lang="scss">
     .window {
+        display: flex;
         background-color: black;
         border: 2px solid white;
         border-radius: 1rem;
         box-shadow: 0 0 2rem #fff8;
+        padding: 1rem 0;
 
-        width: 35rem;
-        height: 20rem;
+        width: min(100%, 35rem);
+        height: max(max-content, 20rem);
     }
 
     .log {
@@ -16,6 +18,8 @@
         flex-wrap: wrap;
         width: 100%;
         height: 100%;
+        gap: 1rem;
+        margin: 0 1rem;
         &--hidden {
             display: none;
         }
@@ -29,6 +33,10 @@
     form {
         display: none;
     }
+
+    @media screen and (min-height: 800px) {
+
+    }
 </style>
 
 <script lang="ts">
@@ -39,6 +47,7 @@
 
     let date = new Date();
     let privateLog = $state(false);
+    let buttonHeight = $state("5rem");
     let loggers: HTMLDivElement[] = [];
     let entry : Entry = {date};
 
@@ -74,20 +83,23 @@
 
     onMount(() => {
         loggers = [elBasicLog];
+        if (document.body.clientHeight < 800) {
+            buttonHeight = "5rem";
+        }
     });
 </script>
 
 <div class="window">
     <div class="log" bind:this={elBasicLog}>
-        <Button text="Feeling good, energetic" width="15rem" href={() => {log("basic-mood", "energetic happy")}} />
-        <Button text="Feeling bad, energetic" width="15rem" href={() => {log("basic-mood", "energetic sad")}} />
-        <Button text="Feeling good, exhausted" width="15rem" href={() => {log("basic-mood", "tired happy")}} />
-        <Button text="Feeling bad, exhausted" width="15rem" href={() => {log("basic-mood", "tired sad")}} />
+        <Button text="Feeling good, energetic" height={buttonHeight} href={() => {log("basic-mood", "energetic happy")}} />
+        <Button text="Feeling bad, energetic" height={buttonHeight} href={() => {log("basic-mood", "energetic sad")}} />
+        <Button text="Feeling good, exhausted" height={buttonHeight} href={() => {log("basic-mood", "tired happy")}} />
+        <Button text="Feeling bad, exhausted" height={buttonHeight} href={() => {log("basic-mood", "tired sad")}} />
     </div>
     <div class="log log--hidden" bind:this={elElaborateDialog}>
-        <Button text="Write a note" width="15rem" href={() => elaborate("note")} />
-        <Button text="Log this entry" width="15rem" href={submit} />
-        <Button text="Start over" width="15rem" href={startOver} />
+        <Button text="Write a note" height={buttonHeight} href={() => elaborate("note")} />
+        <Button text="Log this entry" height={buttonHeight} href={submit} />
+        <Button text="Start over" height={buttonHeight} href={startOver} />
     </div>
 </div>
 

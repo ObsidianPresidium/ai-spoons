@@ -8,7 +8,7 @@ class ContextMenu {
     public isOpen = false;
     public x = 0;
     public y = 0;
-    private items: any[] = [];
+    private items: TContextMenuItem[] = [];
 
     public updateState() {
         contextMenuState.update(state => !state);
