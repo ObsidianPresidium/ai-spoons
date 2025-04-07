@@ -3,18 +3,18 @@ import { redirect } from "@sveltejs/kit";
 import { db } from "$lib/server";
 
 export const actions: Actions = {
-    default: async ({request}) => {
+    default: async ({request, cookies}) => {
         const formData = await request.formData();
         const entryString = formData.get("entry");
         let entry;
         try {
             entry = JSON.parse(entryString as string);
+            db.addEntry(entry);
+            db.saveUserFile();
         } catch {
-            entry = {};
+            console.error("Failed to parse entry:", entryString, ", entry not added.");
         }
 
-        db.addEntry(entry);
-        db.saveUserFile();
         redirect(303, "/log/logged");
     }
 }

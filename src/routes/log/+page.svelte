@@ -28,12 +28,56 @@
 </style>
 
 <script lang="ts">
+    import { contextMenu } from "$lib/contextMenuLogic";
+    import ContextMenu from "$lib/ContextMenus/ContextMenu.svelte";
     import Logger from "$lib/Logger.svelte";
+    import type { TContextMenuItem, Entry, BasicMood } from "$lib/types";
+    
+    let compLogger: Logger;
+
+    const devMenuItems: TContextMenuItem[] = [
+        {
+            type: "title",
+            text: "Dev Menu"
+        },
+        {
+            type: "link",
+            text: "Log Test Entry",
+            action: () => {
+                const mood: BasicMood = "energetic happy";
+                const entry = {
+                    privacy: false,
+                    note: "This is a test entry.",
+                    basicMood: mood,
+                    date: new Date().getTime(),
+                };
+                console.log(`Submitting test entry ${entry} to server...`);
+                prompt();
+                compLogger.forceSubmit(entry);
+            }
+        },
+        {
+            type: "link",
+            text: "Retrieve Stored Entry",
+            action: async () => {
+                const response = await fetch("/api/entry");
+                const data = await response.json();
+                let entryString = `Entries stored: ${data.entries.length}\n`
+                + `Latest entry: ${new Date(data.entries[data.entries.length - 1].date).toUTCString()}\n`
+                + `Latest entry mood: ${data.entries[data.entries.length - 1].basicMood}\n`;
+                alert(entryString);
+            }
+        }
+    ];
 </script>
 <div class="background">
 </div>
 
 <div class="window">
     <h1>How are you feeling right now?</h1>
-    <Logger />
+    <Logger bind:this={compLogger} />
+    <button class="btn" onclick={event => { contextMenu.open(event, devMenuItems) }}>
+        <p>Developer menu</p>
+    </button>
 </div>
+<ContextMenu />

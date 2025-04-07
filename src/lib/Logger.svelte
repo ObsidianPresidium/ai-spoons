@@ -49,17 +49,22 @@
     let privateLog = $state(false);
     let buttonHeight = $state("5rem");
     let loggers: HTMLDivElement[] = [];
-    let entry : Entry = {date};
-
+    let entry : Entry = {date: date.getTime()};
+    
     let elaborationLevel = "basic";
-
+    
     let elElaborateDialog: HTMLDivElement, elBasicLog: HTMLDivElement, elEntry : HTMLTextAreaElement, elForm: HTMLFormElement;
-
+    
     let submit = () => {
-        elEntry.value = JSON.stringify({...entry, date: entry.date.toDateString(), privacy: privateLog});
+        elEntry.value = JSON.stringify({...entry, date: entry.date, privacy: privateLog});
         elForm.submit();
     }
-
+    
+    export const forceSubmit = (entry: Entry) => {
+        elEntry.value = JSON.stringify({...entry, date: entry.date, privacy: privateLog});
+        elForm.submit();
+    }
+    
     let startOver = () => {
         elEntry.value = "";
         elaborate("basic-mood");
