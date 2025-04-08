@@ -52,7 +52,6 @@
                     date: new Date().getTime(),
                 };
                 console.log(`Submitting test entry ${entry} to server...`);
-                prompt();
                 compLogger.forceSubmit(entry);
             }
         },
@@ -62,9 +61,17 @@
             action: async () => {
                 const response = await fetch("/api/entry");
                 const data = await response.json();
-                let entryString = `Entries stored: ${data.entries.length}\n`
-                + `Latest entry: ${new Date(data.entries[data.entries.length - 1].date).toUTCString()}\n`
-                + `Latest entry mood: ${data.entries[data.entries.length - 1].basicMood}\n`;
+                let entryString = "";
+                if (data.entries.length === 0) {
+                    entryString = "No entries found.";
+                } else {
+                    entryString = `Entries stored: ${data.entries.length}\n`
+                    + `Latest entry: ${new Date(data.entries[data.entries.length - 1].date).toUTCString()}\n`
+                    + `Latest entry mood: ${data.entries[data.entries.length - 1].basicMood}\n`;
+                    if (data.entries[data.entries.length - 1].note) {
+                        entryString += `Latest entry note: ${data.entries[data.entries.length - 1].note}`;
+                    }
+                }
                 alert(entryString);
             }
         }
