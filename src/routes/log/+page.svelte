@@ -44,7 +44,11 @@
             type: "link",
             text: "Log Test Entry",
             action: () => {
-                const mood: BasicMood = "energetic happy";
+                const mood: BasicMood = {
+                    energy: Math.floor(Math.random() * 10) + 1,
+                    happiness: Math.floor(Math.random() * 10) + 1,
+                    oneclick: false
+                };
                 const entry = {
                     privacy: false,
                     note: "This is a test entry.",
@@ -61,15 +65,19 @@
             action: async () => {
                 const response = await fetch("/api/entry");
                 const data = await response.json();
+                const entry: Entry = data.entries[data.entries.length - 1];
                 let entryString = "";
                 if (data.entries.length === 0) {
                     entryString = "No entries found.";
                 } else {
                     entryString = `Entries stored: ${data.entries.length}\n`
-                    + `Latest entry: ${new Date(data.entries[data.entries.length - 1].date).toUTCString()}\n`
-                    + `Latest entry mood: ${data.entries[data.entries.length - 1].basicMood}\n`;
-                    if (data.entries[data.entries.length - 1].note) {
-                        entryString += `Latest entry note: ${data.entries[data.entries.length - 1].note}`;
+                    + `Latest entry: ${new Date(entry.date).toUTCString()}\n`
+                    + `Latest entry energy: ${entry.basicMood.energy}\n`
+                    + `Latest entry happiness: ${entry.basicMood.happiness}\n`
+                    + `Logged using One-Click: ${(entry.basicMood.oneclick) ? "yes":"no"}\n`
+                    + `User requested privacy: ${(entry.privacy) ? "yes":"no"}\n`;
+                    if (entry.note) {
+                        entryString += `Latest entry note: ${entry.note}`;
                     }
                 }
                 alert(entryString);

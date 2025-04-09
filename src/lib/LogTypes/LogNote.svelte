@@ -28,7 +28,7 @@
     import LogGeneric from "./LogGeneric.svelte";
     import Button from "$lib/Button.svelte";
 
-    let { buttonHeight, log, elaborate, submit, startOver } = $props();
+    let { buttonHeight, log, elaborate, submit, startOver, getCurrentEntry } = $props();
     
     let note = $state("");
 </script>

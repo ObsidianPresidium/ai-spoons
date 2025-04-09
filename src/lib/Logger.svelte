@@ -22,17 +22,17 @@
 </style>
 
 <script lang="ts">
-    import Slider from "./Slider.svelte";
+    import Toggle from "./Toggle.svelte";
     import { onMount } from "svelte";
     import type { Entry } from "$lib/types";
     import LogEntry from "$lib/LogTypes/LogEntry.svelte";
     import LogMood from "$lib/LogTypes/LogMood.svelte";
-    import LogNote from "./LogTypes/LogNote.svelte";
+    import LogNote from "$lib/LogTypes/LogNote.svelte";
 
     let date = new Date();
     let privateLog = $state(false);
     let buttonHeight = $state("5rem");
-    let entry : Entry = {date: date.getTime()};
+    let entry : Entry = {date: date.getTime(), basicMood: {energy: 0, happiness: 0, oneclick: false}};
 
     let CurrentLog: typeof LogMood | typeof LogNote | typeof LogEntry = $state(LogMood);
     const loggers = new Map();
@@ -62,6 +62,9 @@
     let elaborate = (elaboration: string) => {
         CurrentLog = loggers.get(elaboration);
     }
+    let getCurrentEntry = () => {
+        return entry;
+    }
 
     onMount(() => {
         if (document.body.clientHeight < 800) {
@@ -71,11 +74,11 @@
 </script>
 
 <div class="window">
-    <CurrentLog buttonHeight={buttonHeight} log={log} elaborate={elaborate} submit={submit} startOver={startOver} />
+    <CurrentLog buttonHeight={buttonHeight} log={log} elaborate={elaborate} submit={submit} startOver={startOver} getCurrentEntry={getCurrentEntry} />
 </div>
 
 <p>Logging your mood for {date.toLocaleString()}</p>
-<Slider text="Private log (don't inform AI)" bind:checked={privateLog} submittedName="test" />
+<Toggle text="Private log (don't inform AI)" bind:checked={privateLog} submittedName="test" />
 
 <form bind:this={elForm} method="POST">
     <textarea name="entry" bind:this={elEntry}></textarea>

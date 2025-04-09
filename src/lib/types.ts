@@ -10,12 +10,16 @@ export type TContextMenuItem = {
     action?: () => void;
 }
 
-export type BasicMood = "energetic happy" | "energetic sad" | "tired happy" | "tired sad";
+export type BasicMood = {
+    energy: number,
+    happiness: number,
+    oneclick: boolean
+};
 
 export type Entry = {
-    date: Number;
+    date: number;
     privacy?: boolean;
-    basicMood?: BasicMood;
+    basicMood: BasicMood;
     note?: string;
 }
 
