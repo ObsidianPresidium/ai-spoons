@@ -8,8 +8,9 @@ class Database {
     user: User = {
         name: "Gunnar Gunnarsson",
         id: "1234",
-        preferences: {
-            aiDisabled: false
+        settings: {
+            ["ai.disabled"]: false,
+            ["desktopNotifications.enabled"]: false,
         },
         entries: []
     };

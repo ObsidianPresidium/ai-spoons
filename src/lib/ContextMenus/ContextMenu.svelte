@@ -65,6 +65,7 @@
             font-weight: bold;
             font-size: 1rem;
             text-align: left;
+            white-space: nowrap;
         }
 
         .title {

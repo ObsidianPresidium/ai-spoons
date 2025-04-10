@@ -32,6 +32,8 @@
     import ContextMenu from "$lib/ContextMenus/ContextMenu.svelte";
     import Logger from "$lib/Logger.svelte";
     import type { TContextMenuItem, Entry, BasicMood } from "$lib/types";
+    import { settings } from "$lib/settings";
+    import Service from "$lib/Service.svelte";
     
     let compLogger: Logger;
 
@@ -82,6 +84,65 @@
                 }
                 alert(entryString);
             }
+        },
+        {
+            type: "hrow",
+            text: "Desktop Notifications"
+        },
+        {
+            type: "link",
+            text: "Check Notification Permission",
+            action: () => {
+                if (Notification.permission === "granted") {
+                    alert("Notification permission granted.");
+                } else if (Notification.permission === "denied") {
+                    alert("Notification permission denied.");
+                } else {
+                    alert("Notification permission not requested yet.");
+                }
+            }
+        },
+        {
+            type: "link",
+            text: "Request Notification Permission",
+            action: () => {
+                Notification.requestPermission().then((permission) => {
+                    if (permission === "granted") {
+                        alert("Notification permission granted.");
+                    } else {
+                        alert("Notification permission denied.");
+                    }
+                });
+            }
+        },
+        {
+            type: "link",
+            text: "Send Test Notification",
+            action: () => {
+                if (Notification.permission === "granted") {
+                    if (!settings.get("desktopNotifications.enabled")) {
+                        alert("Desktop notifications are disabled in settings.");
+                    } else {
+                        new Notification("Test Notification", {
+                            body: "This is a test notification.",
+                            icon: "/favicon.png"
+                        });
+                    }
+                } else {
+                    alert("Notification permission not granted.");
+                }
+            }
+        },
+        {
+            type: "hrow",
+            text: "Settings"
+        },
+        {
+            type: "link",
+            text: "Toggle Notifications",
+            action: () => {
+                settings.toggle("desktopNotifications.enabled");
+            }
         }
     ];
 </script>
@@ -96,3 +157,4 @@
     </button>
 </div>
 <ContextMenu />
+<Service />

@@ -10,6 +10,10 @@ export type TContextMenuItem = {
     action?: () => void;
 }
 
+export type TSettings = {
+    [key: string]: any;
+}
+
 export type BasicMood = {
     energy: number,
     happiness: number,
@@ -23,13 +27,11 @@ export type Entry = {
     note?: string;
 }
 
-export type Preferences = {
-    aiDisabled: boolean;
-}
+export type Settings = {}
 
 export type User = {
     name: string;
     id: string;
-    preferences: Preferences;
+    settings: Settings;
     entries: Entry[];
 }
