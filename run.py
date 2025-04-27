@@ -48,7 +48,7 @@ def get_stdout(process, program_name="Application"):
 
 def python_server():
     global python_process
-    python_process = subprocess.Popen(["/usr/bin/python3", "./server/server.py"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    python_process = subprocess.Popen(["/bin/bash", "./server/run-server.sh", "dev" if dev else "run"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     logger.info("Python server started")
     for line in get_stdout(python_process, "Python server"):
         logger.info(f"python -> {line.rstrip()}")

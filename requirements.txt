@@ -1,0 +1,4 @@
+webpush
+fastapi[standard]
+requests
+aiohttp
