@@ -32,8 +32,9 @@
 </style>
 
 <script lang="ts">
-    let { data, children } = $props()
-    let { supabase } = $derived(data)
+    import { onMount } from "svelte";
+    let { data, children } = $props();
+    let { supabase } = $derived(data);
 
     const logout = async () => {
         const { error } = await supabase.auth.signOut()
@@ -44,12 +45,14 @@
     
     const checkSession = async () => {
         const { data, error } = await supabase.auth.getUser();
+        console.log(data);
+        console.log(error);
         if (!data.user) {
             alert("You are not logged in. Please log in to continue.");
         }
     };
 
-    checkSession();
+    // onMount(checkSession);
 </script>
 
 <button on:click={logout} aria-label="Sign out"><svg fill="#000000" width="800px" height="800px" viewBox="0 0 24 24" id="sign-out-2"

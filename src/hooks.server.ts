@@ -1,12 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { type Handle, redirect } from '@sveltejs/kit'
 import { sequence } from '@sveltejs/kit/hooks'
-import "dotenv/config";
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 
-if (!process.env.PUBLIC_SUPABASE_URL) {
+if (!PUBLIC_SUPABASE_URL) {
     throw new Error("PUBLIC_SUPABASE_URL is not defined in the environment variables.");
 }
-if (!process.env.PUBLIC_SUPABASE_ANON_KEY) {
+if (!PUBLIC_SUPABASE_ANON_KEY) {
     throw new Error("PUBLIC_SUPABASE_ANON_KEY is not defined in the environment variables.");
 }
 
@@ -17,7 +17,7 @@ const supabase: Handle = async ({ event, resolve }) => {
      *
      * The Supabase client gets the Auth token from the request cookies.
      */
-    event.locals.supabase = createServerClient(process.env.PUBLIC_SUPABASE_URL!, process.env.PUBLIC_SUPABASE_ANON_KEY!, {
+    event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL!, PUBLIC_SUPABASE_ANON_KEY!, {
         cookies: {
             getAll: () => event.cookies.getAll(),
             /**
@@ -74,7 +74,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
     event.locals.session = session
     event.locals.user = user
 
-    if (!event.locals.session && event.url.pathname.startsWith('/private')) {
+    if (!event.locals.session && event.url.pathname.startsWith('/app')) {
         redirect(303, '/auth')
     }
 

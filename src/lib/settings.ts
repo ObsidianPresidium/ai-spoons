@@ -1,6 +1,7 @@
 import type { TSettings } from "$lib/types";
 import { writable, get as storeGet } from "svelte/store";
 import type { Writable, Unsubscriber } from "svelte/store";
+import { publicSupabase } from "$lib/supabaseClient";
 
 class Settings {
     private settings: Writable<TSettings> = writable({});
@@ -23,15 +24,7 @@ class Settings {
     }
 
     private updateServerSettings(settings: TSettings) {
-        fetch("/api/settings", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                settings: settings
-            })
-        });
+        publicSupabase.from("users").update({"settings": settings});
     }
 
     public get(key: string | string[]): string | TSettings {
