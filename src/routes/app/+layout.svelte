@@ -10,7 +10,7 @@
         padding: 1rem;
         box-sizing: content-box;
         opacity: 0.33;
-        transition: opacity 0.2s ease-in-out;
+        transition: opacity 0.2s ease-in-out, box-shadow 0.1s;
         width: 1.5rem;
         height: 1.5rem;
         
@@ -28,19 +28,25 @@
         &:hover {
             opacity: 1;
         }
+
+        &:active {
+            box-shadow: inset 0 0 1rem black;
+        }
     }
 </style>
 
 <script lang="ts">
     import { onMount } from "svelte";
+    import { goto } from "$app/navigation";
     let { data, children } = $props();
     let { supabase } = $derived(data);
 
     const logout = async () => {
-        const { error } = await supabase.auth.signOut()
+        const { error } = await supabase.auth.signOut();
         if (error) {
             console.error(error)
         }
+        goto("/");
     }
     
     const checkSession = async () => {
@@ -52,7 +58,7 @@
         }
     };
 
-    // onMount(checkSession);
+    onMount(checkSession);
 </script>
 
 <button on:click={logout} aria-label="Sign out"><svg fill="#000000" width="800px" height="800px" viewBox="0 0 24 24" id="sign-out-2"

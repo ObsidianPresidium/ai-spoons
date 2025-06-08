@@ -28,8 +28,7 @@
     import LogEntry from "$lib/LogTypes/LogEntry.svelte";
     import LogMood from "$lib/LogTypes/LogMood.svelte";
     import LogNote from "$lib/LogTypes/LogNote.svelte";
-    import { publicSupabase } from "$lib/supabaseClient";
-    import { redirect } from "@sveltejs/kit";
+    import { goto } from "$app/navigation";
 
     let date = new Date();
     let privateLog = $state(false);
@@ -47,29 +46,33 @@
     
     let elEntry : HTMLTextAreaElement, elForm: HTMLFormElement;
     let submit = async () => {
-        const id = (await publicSupabase.auth.getUser()).data.user?.id;
-        const { error } = await supabaseClient.from("logs").insert({
+        const supabaseUser = await supabaseClient.auth.getUser()
+        const id = supabaseUser.data.user?.id;
+        const logRow = {
             user_id: id,
             ai_disabled: privateLog,
             data: entry
-        });
+        };
+        console.log(supabaseUser);
+        console.log(`Supabase UID: ${id}, Json: ${logRow}`);
+        const { error } = await supabaseClient.from("logs").insert(logRow);
         if (error) console.error(error);
-        // redirect(303, "/log/logged");
+        goto("/app/log/logged");
     }
     
     export const forceSubmit = async (entry: Entry) => {
         const supabaseUser = await supabaseClient.auth.getUser()
         const id = supabaseUser.data.user?.id;
-        const logRow = JSON.stringify({
+        const logRow = {
             user_id: id,
             ai_disabled: privateLog,
             data: entry
-        });
+        };
         console.log(supabaseUser);
         console.log(`Supabase UID: ${id}, Json: ${logRow}`);
         const { error } = await supabaseClient.from("logs").insert(logRow);
         if (error) console.error(error);
-        // redirect(303, "/log/logged");
+        goto("/app/log/logged");
     }
     
     let startOver = () => {
