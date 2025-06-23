@@ -4,14 +4,17 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 100%;
-        height: 100%;
+        width: 40rem;
+        height: 10rem;
     }
 
     .background {
         background-color: black;
         width: 100vw;
         height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
     h1 {
@@ -29,6 +32,6 @@
 <div class="background">
     <div class="window">
         <h1>The entry has been logged.</h1>
-        <Button text="Return to calendar" href="/calendar" />
+        <Button text="Return to calendar" href="/app/calendar" />
     </div>
 </div>

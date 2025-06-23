@@ -15,10 +15,6 @@
         font-family: "Inter", sans-serif;
     }
 
-    :global(form) {
-        display: none;
-    }
-
     :global(h2) {
         color: white;
         font-family: "Inter", sans-serif;

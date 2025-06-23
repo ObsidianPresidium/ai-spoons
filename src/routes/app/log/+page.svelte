@@ -35,6 +35,8 @@
     import { settings } from "$lib/settings";
     import Service from "$lib/Service.svelte";
     
+    let { data } = $props();
+    
     let compLogger: Logger;
 
     const devMenuItems: TContextMenuItem[] = [
@@ -65,22 +67,25 @@
             type: "link",
             text: "Retrieve Stored Entry",
             action: async () => {
-                const response = await fetch("/api/entry");
-                const data = await response.json();
-                const entry: Entry = data.entries[data.entries.length - 1];
+                // const response = await fetch("/api/entry");
+                // const data = await response.json();
+                // const entry: Entry = data.entries[data.entries.length - 1];
+                const entries = await data.supabase.from("logs").select("data");
+                if (entries.data === null) {
+                    alert("No entries found.");
+                    return;
+                }
+                const lastRow = entries.data[entries.data.length - 1];
+                const entry: Entry = lastRow.data;
                 let entryString = "";
-                if (data.entries.length === 0) {
-                    entryString = "No entries found.";
-                } else {
-                    entryString = `Entries stored: ${data.entries.length}\n`
-                    + `Latest entry: ${new Date(entry.date).toUTCString()}\n`
-                    + `Latest entry energy: ${entry.basicMood.energy}\n`
-                    + `Latest entry happiness: ${entry.basicMood.happiness}\n`
-                    + `Logged using One-Click: ${(entry.basicMood.oneclick) ? "yes":"no"}\n`
-                    + `User requested privacy: ${(entry.privacy) ? "yes":"no"}\n`;
-                    if (entry.note) {
-                        entryString += `Latest entry note: ${entry.note}`;
-                    }
+                entryString = `Entries stored: ${entries.data.length}\n`
+                + `Latest entry: ${new Date(entry.date).toUTCString()}\n`
+                + `Latest entry energy: ${entry.basicMood.energy}\n`
+                + `Latest entry happiness: ${entry.basicMood.happiness}\n`
+                + `Logged using One-Click: ${(entry.basicMood.oneclick) ? "yes":"no"}\n`
+                + `User requested privacy: ${(entry.privacy) ? "yes":"no"}\n`;
+                if (entry.note) {
+                    entryString += `Latest entry note: ${entry.note}`;
                 }
                 alert(entryString);
             }
@@ -151,7 +156,7 @@
 
 <div class="window">
     <h1>How are you feeling right now?</h1>
-    <Logger bind:this={compLogger} />
+    <Logger supabaseClient={data.supabase} bind:this={compLogger} />
     <button class="btn" onclick={event => { contextMenu.open(event, devMenuItems) }}>
         <p>Developer menu</p>
     </button>

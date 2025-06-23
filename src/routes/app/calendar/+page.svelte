@@ -18,10 +18,12 @@
 <script lang="ts">
     import Calendar from "$lib/Calendar.svelte";
     import ContextMenu from "$lib/ContextMenus/ContextMenu.svelte";
+
+    let { data }: { data: { supabase: any } } = $props();
 </script>
 <div class="background">
     <div class="window">
-        <Calendar />
+        <Calendar supabase={data.supabase} />
     </div>
 
     <ContextMenu />

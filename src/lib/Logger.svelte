@@ -28,11 +28,16 @@
     import LogEntry from "$lib/LogTypes/LogEntry.svelte";
     import LogMood from "$lib/LogTypes/LogMood.svelte";
     import LogNote from "$lib/LogTypes/LogNote.svelte";
+    import { goto } from "$app/navigation";
 
     let date = new Date();
     let privateLog = $state(false);
     let buttonHeight = $state("5rem");
     let entry : Entry = {date: date.getTime(), basicMood: {energy: 0, happiness: 0, oneclick: false}};
+
+    let { supabaseClient } = $props();
+
+
 
     let CurrentLog: typeof LogMood | typeof LogNote | typeof LogEntry = $state(LogMood);
     const loggers = new Map();
@@ -40,14 +45,34 @@
     loggers.set("note", LogNote);
     
     let elEntry : HTMLTextAreaElement, elForm: HTMLFormElement;
-    let submit = () => {
-        elEntry.value = JSON.stringify({...entry, date: entry.date, privacy: privateLog});
-        elForm.submit();
+    let submit = async () => {
+        const supabaseUser = await supabaseClient.auth.getUser()
+        const id = supabaseUser.data.user?.id;
+        const logRow = {
+            user_id: id,
+            ai_disabled: privateLog,
+            data: entry
+        };
+        console.log(supabaseUser);
+        console.log(`Supabase UID: ${id}, Json: ${logRow}`);
+        const { error } = await supabaseClient.from("logs").insert(logRow);
+        if (error) console.error(error);
+        goto("/app/log/logged");
     }
     
-    export const forceSubmit = (entry: Entry) => {
-        elEntry.value = JSON.stringify({...entry, date: entry.date, privacy: privateLog});
-        elForm.submit();
+    export const forceSubmit = async (entry: Entry) => {
+        const supabaseUser = await supabaseClient.auth.getUser()
+        const id = supabaseUser.data.user?.id;
+        const logRow = {
+            user_id: id,
+            ai_disabled: privateLog,
+            data: entry
+        };
+        console.log(supabaseUser);
+        console.log(`Supabase UID: ${id}, Json: ${logRow}`);
+        const { error } = await supabaseClient.from("logs").insert(logRow);
+        if (error) console.error(error);
+        goto("/app/log/logged");
     }
     
     let startOver = () => {
