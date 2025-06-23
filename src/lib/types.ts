@@ -35,3 +35,12 @@ export type User = {
     settings: Settings;
     entries: Entry[];
 }
+
+export type Event = {
+    isCalendarEvent: boolean;
+    calendarOrigin: null | number;  // Is null if it doesn't refer to a calendar, otherwise an id.
+    title: string | null;
+    note: string | null;
+    startTime: Date;
+    endTime: Date | null;
+}

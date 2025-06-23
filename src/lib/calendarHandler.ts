@@ -42,6 +42,7 @@ export const calendar = {
     setCalendarState,
     tools: {
         getCurrentDate: () => { return get(calendarState).currentDate; },
+        getCalendarState: () => { return get(calendarState).view },
         getListedDays: () => {
             const _calendarState = get(calendarState);
             

@@ -1,6 +1,7 @@
 <style lang="scss">
     .window {
         display: flex;
+        position: relative;
 
         width: 5rem;
         height: 4rem;
@@ -32,20 +33,67 @@
             color: #888;
         }
     }
+
+    .events-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        height: 100%;
+        align-items: center;
+    }
+
+    .event {
+        width: 0.5rem;
+        height: 75%;
+        margin: 0.1rem;
+        
+
+        &--calendar-event {
+            background-color: lightblue;
+        }
+
+        &--entry-event {
+            background-color: yellow;
+        }
+    }
+
+    .is-current-day {
+        position: relative;
+        &::after {
+            content: "";
+            position: absolute;
+            width: 2.5rem;
+            height: 2.5rem;
+            top: -0.4rem;
+            right: -0.5rem;
+            border: 0.2rem solid #833;
+            border-radius: 50%;
+        }
+    }
 </style>
 
 <script lang="ts">
     import { onMount } from "svelte";
     import { contextMenu } from "$lib/contextMenuLogic";
     import { calendar } from "$lib/calendarHandler";
+    import type { Event } from "$lib/types";
     
     interface Props {
         date?: Date,
         monthDiff: number,
-        forceText?: string
+        forceText?: string,
+        events: Event[];
     }
 
-    let { date = new Date(), monthDiff, forceText = "" } : Props = $props();
+    let { date = new Date(), monthDiff, forceText = "", events = [] } : Props = $props();
+    
+    const currentDate = new Date();
+
+    const test_events = [
+        {isCalendarEvent: false, calendarOrigin: null, title: "guten", note: null, startTime: new Date(1749721854420), endTime: null},
+        {isCalendarEvent: true, calendarOrigin: null, title: "heute", note: "leute", startTime: new Date(1749721889045), endTime: null}
+    ]
 
     let window: HTMLDivElement;
 
@@ -106,10 +154,21 @@
         }
     }
 
+const isSameDay = (date1: Date, date2: Date) => {
+    return date1.getDate() === date2.getDate() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getFullYear() === date2.getFullYear();
+};
+
 </script>
 
 <div class="window" bind:this={window} onclick={clickHandler}>
-    <p class="day" class:day--greyed-out={monthDiff != 0}>
+    <div class="events-container">
+        {#each events as event}
+            <div class="event event--entry-event" class:event--entry-event={!event.isCalendarEvent} class:event--calendar-event={event.isCalendarEvent}>&nbsp;</div>
+        {/each}
+    </div>
+    <p class="day" class:day--greyed-out={monthDiff != 0} class:is-current-day={isSameDay(date, currentDate)}>
         {#if forceText === ""}
             {date.getDate()}
         {:else}
