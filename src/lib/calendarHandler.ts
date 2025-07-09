@@ -2,11 +2,23 @@ import type { TCalendarState } from '$lib/types';
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
 
-function getDaysInMonth(date: Date): Date[] {
+type RangeString = "month" | "week" | "day";
+
+function getDaysInRange(date: Date, range: RangeString): Date[] {
     let days = [];
-    let daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-    for (let i=0; i<daysInMonth; i++) {
-        days.push(new Date(date.getFullYear(), date.getMonth(), i+1));
+    if (range === "month") {
+        let daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        for (let i=0; i<daysInMonth; i++) {
+            days.push(new Date(date.getFullYear(), date.getMonth(), i+1));
+        }
+    } else if (range === "week") {
+        for (let i=0; i < 7; i++) {
+            days.push(new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay() + i + 1))
+        }
+    } else if (range === "day") {
+        return [date];
+    } else {
+        throw new TypeError("parameter range not one of 'day', 'week', or 'month'");
     }
     return days;
 }
@@ -14,7 +26,7 @@ function getDaysInMonth(date: Date): Date[] {
 export const calendarState: Writable<TCalendarState> = writable<TCalendarState>({
     currentDate: new Date(),
     view: 'month',
-    days: getDaysInMonth(new Date())
+    days: getDaysInRange(new Date(), "month")
 });
 
 const setCalendarState = (view: string, date: Date) => {
@@ -27,12 +39,12 @@ const setCalendarState = (view: string, date: Date) => {
     if (date) {
         calendarState.update(state => {
             state.currentDate = date;
-            state.days = getDaysInMonth(date);
+            state.days = getDaysInRange(date, state.view as RangeString);
             return state;
         });
     } else {
         calendarState.update(state => {
-            state.days = getDaysInMonth(state.currentDate);
+            state.days = getDaysInRange(state.currentDate, state.view as RangeString);
             return state;
         });
     }
@@ -46,6 +58,7 @@ export const calendar = {
         getListedDays: () => {
             const _calendarState = get(calendarState);
             
+            if (_calendarState.view === "week" || _calendarState.view === "day") return _calendarState.days;
             let index = 0;
             let firstMonday = _calendarState.days[index];
             while (firstMonday.getDay() !== 1) {

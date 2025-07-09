@@ -83,7 +83,7 @@
         date?: Date,
         monthDiff: number,
         forceText?: string,
-        events: Event[];
+        events: Event[]
     }
 
     let { date = new Date(), monthDiff, forceText = "", events = [] } : Props = $props();

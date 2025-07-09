@@ -70,12 +70,16 @@
     import CalendarDay from "$lib/CalendarDay.svelte";
     import { onDestroy } from "svelte";
     import { SvelteMap } from "svelte/reactivity";
+    import { linear, cubicOut } from "svelte/easing";
+    import { fade } from "svelte/transition";
 
     let listedDays = $state(calendar.tools.getListedDays());
     let elDate: HTMLHeadingElement;
     let elDateFake: HTMLHeadingElement;
     let elCalendar: HTMLDivElement;
-    let calendarView = $state("monthly");
+    let calendarView = $state("month");
+    let animationFunctions: void[] = [];
+    let animationDays: number[] = [];
 
     let { supabase } = $props();
 
@@ -126,11 +130,54 @@
     }
 
     const changeCalendarState = (target: string) => {
-        if (!["daily", "weekly", "monthly"].includes(target)) {
-            throw new Error("Calendar state target must be one of daily, weekly, or monthly!");
+        if (!["day", "week", "month"].includes(target)) {
+            throw new Error("Calendar state target must be one of day, week, or month!");
         }
         calendar.setCalendarState(target, $calendarState.currentDate);
         calendarView = target;
+
+        animationDays = (calendar.tools.getCurrentDate().getDay() === 0) ? 
+        Array.from(listedDays.slice(0, 7), (v, index) => index) :
+        Array.from(listedDays.slice(7, 14), (v, index) => index + 7);  // Create an array of relevant listed day indexes, e.g. [7, 8, 9, ...]
+        const fadeDays = Array.from(listedDays, (v, index) => !animationDays.includes(index));
+        listedDays = [];
+    }
+
+    const centerAndScale = (node: HTMLElement, params: { delay?: number, duration?: number, easing?: (t: number) => number}) => {
+        const calendarRect = elCalendar.getBoundingClientRect();
+        const nodeRect = node.getBoundingClientRect();
+
+        const calendarCenterY = calendarRect.top + (calendarRect.height / 2);
+        const nodeCenterY = nodeRect.top + (nodeRect.height / 2);
+        const translateY = calendarCenterY - nodeCenterY;
+        console.log(`translateY target: ${translateY}`);
+
+        const css = (t: number, u: number) => {
+            let opacity = Math.min(t * 2, 1);
+            let transform = `scaleY(${u * 2 + 1}) translateY(${nodeRect.height / u - nodeRect.height})`;
+            return `opacity: ${opacity}; transform: ${transform}`;
+        }
+
+        return {
+            delay: params.delay || 0,
+            duration: params.duration || 400,
+            easing: params.easing || linear,
+            css: css
+        }
+    };
+
+    const dayTransition = (node: HTMLElement, params: { delay?: number, duration?: number, easing?: (t: number) => number, listedDayIndex: number }) => {
+        if (animationDays.includes(params.listedDayIndex)) {
+            return centerAndScale(node, params);
+        }
+        return fade(node, {...params, duration: (params.duration || 400) / 2});
+    };
+
+    const weekPrint = (days: Date[]) => {
+        if (days[0].getMonth() !== days[6].getMonth()) {
+            return `${days[0].getDate()} ${days[0].toLocaleString("default", {month: "long"})}-${days[6].getDate()} ${days[6].toLocaleString("default", {month: "long"})}}`;
+        }
+        return `${days[0].getDate()}-${days[6].getDate()} ${days[0].toLocaleString("default", {month: "long"})}`
     }
     
     onDestroy(destroySubscription);
@@ -139,27 +186,33 @@
 
 <div class="window">
     <div class="date">
-        <h2 class="date__text">{$calendarState.currentDate.toLocaleString("default", {month: "long"})} {$calendarState.currentDate.getFullYear()}</h2>
+        {#if calendarView === "month"}
+            <h2 class="date__text">{$calendarState.currentDate.toLocaleString("default", {month: "long"})} {$calendarState.currentDate.getFullYear()}</h2>
+        {:else if calendarView === "week"}
+            <h2 class="date__text">{weekPrint($calendarState.days)}</h2>
+        {:else}
+            <h2 class="date__text">${$calendarState.currentDate.getDate()} ${$calendarState.currentDate.getMonth()}</h2>
+        {/if}
     </div>
     <div class="indicator__container">
         <button 
             class="indicator indicator--inactive" 
-            class:indicator--active={calendarView === "monthly"}
-            onclick={() => changeCalendarState("monthly")}
+            class:indicator--active={calendarView === "month"}
+            onclick={() => changeCalendarState("month")}
         >
             Monthly
         </button>
         <button 
             class="indicator indicator--inactive" 
-            class:indicator--active={calendarView === "weekly"}
-            onclick={() => changeCalendarState("weekly")}
+            class:indicator--active={calendarView === "week"}
+            onclick={() => changeCalendarState("week")}
         >
             Weekly
         </button>
         <button 
             class="indicator indicator--inactive" 
-            class:indicator--active={calendarView === "daily"}
-            onclick={() => changeCalendarState("daily")}
+            class:indicator--active={calendarView === "day"}
+            onclick={() => changeCalendarState("day")}
         >
             Daily
         </button>
@@ -187,7 +240,9 @@
             <p class="day-of-week__text">S</p>
         </div>
         {#each listedDays as day, index}
-            <CalendarDay events={getEvent(index)} date={day} monthDiff={calendar.tools.monthDiff(calendar.tools.getCurrentDate(), day)} />
+            <div transition:dayTransition={ {listedDayIndex: index} }>
+                <CalendarDay events={getEvent(index)} date={day} monthDiff={calendar.tools.monthDiff(calendar.tools.getCurrentDate(), day)} />
+            </div>
         {/each}
     </div>
 </div>
