@@ -66,8 +66,9 @@
     }
 </style>
 <script lang="ts">
-    import { calendar, calendarState } from "$lib/calendarHandler";
+    import { calendar, calendarState, eventCreatorOpen } from "$lib/calendarHandler";
     import CalendarDay from "$lib/CalendarDay.svelte";
+    import EventCreator from "./EventCreator.svelte";
     import { onDestroy } from "svelte";
     import { SvelteMap } from "svelte/reactivity";
     import { linear, cubicOut } from "svelte/easing";
@@ -175,7 +176,7 @@
 
     const weekPrint = (days: Date[]) => {
         if (days[0].getMonth() !== days[6].getMonth()) {
-            return `${days[0].getDate()} ${days[0].toLocaleString("default", {month: "long"})}-${days[6].getDate()} ${days[6].toLocaleString("default", {month: "long"})}}`;
+            return `${days[0].getDate()} ${days[0].toLocaleString("default", {month: "long"})}-${days[6].getDate()} ${days[6].toLocaleString("default", {month: "long"})}`;
         }
         return `${days[0].getDate()}-${days[6].getDate()} ${days[0].toLocaleString("default", {month: "long"})}`
     }
@@ -246,3 +247,7 @@
         {/each}
     </div>
 </div>
+
+{#if $eventCreatorOpen}
+    <EventCreator action="create"></EventCreator>
+{/if}

@@ -29,6 +29,8 @@ export const calendarState: Writable<TCalendarState> = writable<TCalendarState>(
     days: getDaysInRange(new Date(), "month")
 });
 
+export const eventCreatorOpen: Writable<boolean> = writable<boolean>(false);
+
 const setCalendarState = (view: string, date: Date) => {
     if (view) {
         calendarState.update(state => {

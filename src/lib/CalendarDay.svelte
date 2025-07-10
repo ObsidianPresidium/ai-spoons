@@ -76,7 +76,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { contextMenu } from "$lib/contextMenuLogic";
-    import { calendar } from "$lib/calendarHandler";
+    import { calendar, eventCreatorOpen } from "$lib/calendarHandler";
     import type { Event } from "$lib/types";
     
     interface Props {
@@ -129,14 +129,14 @@
                     type: "link",
                     text: "Add Event",
                     action: () => {
-                        console.log("Add Event");
+                        $eventCreatorOpen = true;
                     }
                 },
                 {
                     type: "link",
                     text: "Edit Event",
                     action: () => {
-                        console.log("Edit Event");
+                        $eventCreatorOpen = true;
                     }
                 },
                 {
@@ -147,7 +147,7 @@
                     type: "link",
                     text: "Delete Event",
                     action: () => {
-                        console.log("Delete Event");
+                        $eventCreatorOpen = true;
                     }
                 }
             ]);
