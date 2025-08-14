@@ -77,13 +77,13 @@
     import { onMount } from "svelte";
     import { contextMenu } from "$lib/contextMenuLogic";
     import { calendar, eventCreatorOpen } from "$lib/calendarHandler";
-    import type { Event } from "$lib/types";
+    import type { CalendarEvent } from "$lib/types";
     
     interface Props {
         date?: Date,
         monthDiff: number,
         forceText?: string,
-        events: Event[]
+        events: CalendarEvent[]
     }
 
     let { date = new Date(), monthDiff, forceText = "", events = [] } : Props = $props();

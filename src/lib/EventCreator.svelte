@@ -34,9 +34,14 @@
 <script lang="ts">
     import ActionButton from "./ActionButton.svelte";
     import { eventCreatorOpen } from "./calendarHandler";
-    let { action = "create" } = $props();
+    import { onMount } from "svelte";
+    import type { CalendarEvent } from "./types";
+    let { action = "create", dummyMode = false, eventDummy = $bindable() } = $props();
     let actionText = $state("");
     let cancelText = $state("");
+
+    let eventTitle: string, eventDateFrom: string, eventDateTo: string;
+    let doAction: () => void;
 
     switch (action) {
         case "create":
@@ -48,19 +53,35 @@
             cancelText = "Delete Event";
             break;
     }
+
+    onMount(() => {
+        doAction = () => {
+            if (dummyMode) {
+                eventDummy({
+                    isCalendarEvent: true,
+                    calendarOrigin: null,
+                    title: eventTitle,
+                    note: null,
+                    startTime: new Date(eventDateFrom),
+                    endTime: new Date(eventDateTo)
+                })
+            }
+            $eventCreatorOpen = false;
+        };
+    });
 </script>
 
 <div class="window">
     <h2>Create Event</h2>
-    <input type="text" name="" id="title" placeholder="Event Title">
+    <input type="text" name="" id="title" placeholder="Event Title" bind:value={eventTitle}>
     <h3>Date</h3>
     <div class="date-flexbox">
-        <input type="datetime" name="" id="date-from">
+        <input type="datetime" name="" id="date-from" bind:value={eventDateFrom}>
         &rarr;
-        <input type="datetime" name="" id="date-to">
+        <input type="datetime" name="" id="date-to" bind:value={eventDateTo}>
     </div>
     <div class="buttons">
-        <ActionButton text={actionText} href={() => {$eventCreatorOpen = false;}}></ActionButton>
+        <ActionButton text={actionText} href={doAction}></ActionButton>
         <ActionButton text={cancelText} color="#ff3b30" href={() => {$eventCreatorOpen = false;}}></ActionButton>
     </div>
 </div>

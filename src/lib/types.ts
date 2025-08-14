@@ -36,7 +36,7 @@ export type User = {
     entries: Entry[];
 }
 
-export type Event = {
+export type CalendarEvent = {
     isCalendarEvent: boolean;
     calendarOrigin: null | number;  // Is null if it doesn't refer to a calendar, otherwise an id.
     title: string | null;

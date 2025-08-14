@@ -35,7 +35,7 @@
     let buttonHeight = $state("5rem");
     let entry : Entry = {date: date.getTime(), basicMood: {energy: 0, happiness: 0, oneclick: false}};
 
-    let { supabaseClient } = $props();
+    let { supabaseClient, dummyMode=false, logDummy=$bindable() } = $props();
 
 
 
@@ -46,18 +46,22 @@
     
     let elEntry : HTMLTextAreaElement, elForm: HTMLFormElement;
     let submit = async () => {
-        const supabaseUser = await supabaseClient.auth.getUser()
-        const id = supabaseUser.data.user?.id;
-        const logRow = {
-            user_id: id,
-            ai_disabled: privateLog,
-            data: entry
-        };
-        console.log(supabaseUser);
-        console.log(`Supabase UID: ${id}, Json: ${logRow}`);
-        const { error } = await supabaseClient.from("logs").insert(logRow);
-        if (error) console.error(error);
-        goto("/app/log/logged");
+        if (!dummyMode) {
+            const supabaseUser = await supabaseClient.auth.getUser()
+            const id = supabaseUser.data.user?.id;
+            const logRow = {
+                user_id: id,
+                ai_disabled: privateLog,
+                data: entry
+            };
+            console.log(supabaseUser);
+            console.log(`Supabase UID: ${id}, Json: ${logRow}`);
+            const { error } = await supabaseClient.from("logs").insert(logRow);
+            if (error) console.error(error);
+            goto("/app/log/logged");
+        } else {
+            logDummy(entry);
+        }
     }
     
     export const forceSubmit = async (entry: Entry) => {
