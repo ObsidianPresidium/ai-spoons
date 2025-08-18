@@ -1,4 +1,5 @@
 <script lang="ts">
+    import '@fontsource/inter';
     import { invalidate } from '$app/navigation'
     import { onMount } from 'svelte'
 

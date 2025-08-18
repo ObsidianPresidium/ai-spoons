@@ -66,7 +66,8 @@
     }
 </style>
 <script lang="ts">
-    import { calendar, calendarState, eventCreatorOpen } from "$lib/calendarHandler";
+    import { calendar, calendarState, calendarStateListedDayEvents, eventCreatorOpen } from "$lib/calendarHandler";
+    import type { Event } from "./types";
     import CalendarDay from "$lib/CalendarDay.svelte";
     import EventCreator from "./EventCreator.svelte";
     import { onDestroy } from "svelte";
@@ -84,33 +85,32 @@
 
     let { supabase } = $props();
 
-    let thisMonthsEvents = new SvelteMap();
-
     let getMonthEvents = async () => {
-        thisMonthsEvents = new SvelteMap();
+        $calendarStateListedDayEvents = new SvelteMap<number, Event[]>();
         const startInterval = new Date($calendarState.currentDate.getFullYear(), $calendarState.currentDate.getMonth(), -6).toISOString();
         const endInterval = new Date($calendarState.currentDate.getFullYear(), $calendarState.currentDate.getMonth() + 1, 6).toISOString();
         const { data, error } = await supabase.from("logs").select("data, created_at").gte("created_at", startInterval).lte("created_at", endInterval);
+        console.log(data);
         if (error) throw new Error(error);
         const firstDay = listedDays[0].getTime();
         data.forEach((row: any, index: number) => {
             const currentDay = new Date(row.created_at).getTime();
             const diff = currentDay - firstDay;
             const dayDiff = Math.floor(diff / 86400000);
-            const parsedEvents = thisMonthsEvents.get(dayDiff);
+            const parsedEvents = $calendarStateListedDayEvents.get(dayDiff);
             if (parsedEvents && Array.isArray(parsedEvents)) {
-                thisMonthsEvents.set(
+                $calendarStateListedDayEvents.set(
                     dayDiff,
                     [...parsedEvents, row.data]
                 );
             } else {
-                thisMonthsEvents.set(
+                $calendarStateListedDayEvents.set(
                     dayDiff,
                     [row.data]
                 );
             }
         });
-        console.log(thisMonthsEvents);
+        console.log($calendarStateListedDayEvents);
     };
 
     const destroySubscription = calendarState.subscribe(() => {
@@ -123,12 +123,6 @@
     };
 
     getMonthEvents();
-
-    const getEvent = (day: number) => {
-        const events = thisMonthsEvents.get(day);
-        if (events == null) return []
-        return Array.isArray(events) ? events : [];
-    }
 
     const changeCalendarState = (target: string) => {
         if (!["day", "week", "month"].includes(target)) {
@@ -242,7 +236,7 @@
         </div>
         {#each listedDays as day, index}
             <div transition:dayTransition={ {listedDayIndex: index} }>
-                <CalendarDay events={getEvent(index)} date={day} monthDiff={calendar.tools.monthDiff(calendar.tools.getCurrentDate(), day)} />
+                <CalendarDay index={index} date={day} monthDiff={calendar.tools.monthDiff(calendar.tools.getCurrentDate(), day)} />
             </div>
         {/each}
     </div>

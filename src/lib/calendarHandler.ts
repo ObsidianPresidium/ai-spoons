@@ -1,6 +1,7 @@
-import type { TCalendarState } from '$lib/types';
+import type { TCalendarState, Event, CalendarStateListedDayEvents } from '$lib/types';
 import type { Writable } from 'svelte/store';
 import { get, writable } from 'svelte/store';
+import { SvelteMap } from 'svelte/reactivity';
 
 type RangeString = "month" | "week" | "day";
 
@@ -28,6 +29,8 @@ export const calendarState: Writable<TCalendarState> = writable<TCalendarState>(
     view: 'month',
     days: getDaysInRange(new Date(), "month")
 });
+
+export const calendarStateListedDayEvents: CalendarStateListedDayEvents = writable(new SvelteMap<number, Event[]>());
 
 export const eventCreatorOpen: Writable<boolean> = writable<boolean>(false);
 

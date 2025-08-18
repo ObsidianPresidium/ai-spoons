@@ -1,3 +1,6 @@
+import type { Writable } from "svelte/store";
+import { SvelteMap } from "svelte/reactivity";
+
 export type TCalendarState = {
     currentDate: Date;
     view: string;
@@ -44,3 +47,5 @@ export type Event = {
     startTime: Date;
     endTime: Date | null;
 }
+
+export type CalendarStateListedDayEvents = Writable<SvelteMap<number, Event[]>>;

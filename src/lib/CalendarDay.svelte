@@ -1,4 +1,5 @@
 <style lang="scss">
+    
     .window {
         display: flex;
         position: relative;
@@ -74,19 +75,21 @@
 </style>
 
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { onDestroy } from "svelte";
     import { contextMenu } from "$lib/contextMenuLogic";
-    import { calendar, eventCreatorOpen } from "$lib/calendarHandler";
-    import type { Event } from "$lib/types";
+    import { calendar, eventCreatorOpen, calendarStateListedDayEvents } from "$lib/calendarHandler";
+    import type { CalendarStateListedDayEvents, Event } from "$lib/types";
     
     interface Props {
         date?: Date,
+        index: number,
         monthDiff: number,
-        forceText?: string,
-        events: Event[]
+        forceText?: string
     }
 
-    let { date = new Date(), monthDiff, forceText = "", events = [] } : Props = $props();
+    let { date = new Date(), monthDiff, index, forceText = "" } : Props = $props();
+
+    let events: Event[] = $state($calendarStateListedDayEvents.get(index)!);
     
     const currentDate = new Date();
 
@@ -154,17 +157,18 @@
         }
     }
 
-const isSameDay = (date1: Date, date2: Date) => {
-    return date1.getDate() === date2.getDate() &&
-           date1.getMonth() === date2.getMonth() &&
-           date1.getFullYear() === date2.getFullYear();
-};
+    const isSameDay = (date1: Date, date2: Date) => {
+        return date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear();
+    };
 
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div class="window" bind:this={window} onclick={clickHandler}>
     <div class="events-container">
-        {#each events as event}
+        {#each $calendarStateListedDayEvents.get(index)! as event}
             <div class="event event--entry-event" class:event--entry-event={!event.isCalendarEvent} class:event--calendar-event={event.isCalendarEvent}>&nbsp;</div>
         {/each}
     </div>
